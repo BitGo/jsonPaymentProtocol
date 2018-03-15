@@ -4,7 +4,8 @@
   "description": "Simple interface for retrieving JSON payment requests and submitting payments",
   "main": "index.js",
   "dependencies": {
-    "lodash": "^4.17.4",
+    "bluebird": "~3.5.0",
+    "lodash": "~4.17.5",
     "request": "^2.83.0"
   },
   "devDependencies": {
@@ -12,12 +13,12 @@
     "promptly": "^2.2.0"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=6.9.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "BitPay",
+  "author": "BitGo",
   "repository": {
     "type": "git",
     "url": "https://github.com/bitpay/jsonPaymentProtocol.git"

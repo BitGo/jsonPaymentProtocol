@@ -11,7 +11,7 @@ This is the first version of the JSON payment protocol interface. If you have qu
 We support both callbacks and promises. For promises just add Async to the end of the function name. Be careful to follow the notes about when to broadcast your payment. **Broadcasting a payment before getting a success notification back from the server in most cases will lead to a failed payment for the sender.** The sender will bear the cost of paying transaction fees yet again to get their money back.
 
 #### Callbacks
-```
+```javascript
 const JsonPaymentProtocol = require('json-payment-protocol');
 const paymentProtocol = new JsonPaymentProtocol();
 
@@ -30,7 +30,7 @@ paymentProtocol.getRawPaymentRequest(requestUrl, function (err, response) {
     console.log(paymentRequest);
 
     //TODO: Create the rawTransaction and sign it in your wallet instead of this, do NOT broadcast yet
-    let currency = 'BTC'
+    let currency = 'BTC';
     let signedRawTransaction = '02000000010c2b0d60448d5cdfebe222014407bdb408b8427f837447484911efddea700323000000006a47304402201d3ed3117f1968c3b0a078f15f8462408c745ff555b173eff3dfe0a25e063c0c02200551572ec33d45ece8e64275970bd1b1694621f0ed8fac2f7e18095f170fe3fe012102d4edb773e3bd94e1251790f5cc543cbfa76c2b0abad14898674b1c4e27176ef2ffffffff02c44e0100000000001976a914dd826377dcf2075e5065713453cfad675ba9434f88aca070002a010000001976a914e7d0344ba970301e93cd7b505c7ae1b5bcf5639288ac00000000';
 
     paymentProtocol.sendPayment(currency, signedRawTransaction, paymentRequest.paymentUrl, function(err, response) {
@@ -46,7 +46,7 @@ paymentProtocol.getRawPaymentRequest(requestUrl, function (err, response) {
 ```
 
 #### Promises
-```
+```javascript
 const JsonPaymentProtocol = require('json-payment-protocol');
 const paymentProtocol = new JsonPaymentProtocol();
 
@@ -61,7 +61,7 @@ paymentProtocol
     console.log(paymentRequest);
     
     //TODO: Create the rawTransaction and sign it in your wallet instead of this, do NOT broadcast yet
-    let currency = 'BTC'
+    let currency = 'BTC';
     let signedRawTransaction = '02000000010c2b0d60448d5cdfebe222014407bdb408b8427f837447484911efddea700323000000006a47304402201d3ed3117f1968c3b0a078f15f8462408c745ff555b173eff3dfe0a25e063c0c02200551572ec33d45ece8e64275970bd1b1694621f0ed8fac2f7e18095f170fe3fe012102d4edb773e3bd94e1251790f5cc543cbfa76c2b0abad14898674b1c4e27176ef2ffffffff02c44e0100000000001976a914dd826377dcf2075e5065713453cfad675ba9434f88aca070002a010000001976a914e7d0344ba970301e93cd7b505c7ae1b5bcf5639288ac00000000';
 
     return paymentProtocol.sendPaymentAsync(currency, signedRawTransaction, paymentRequest.paymentUrl);
@@ -80,10 +80,10 @@ paymentProtocol
 
 Options passed to `new JsonPaymentProtocol()` are passed to request, so if you need to use a proxy or set any other request.js flags you can do so by including them when instantiating your instance. For example:
 
-```
+```javascript
 new JsonPaymentProtocol({
   proxy: 'socks://mySocksProxy.local'
-})
+});
 ```
 
 ### URI Formats

@@ -3,10 +3,10 @@
 const crypto = require('crypto');
 const query = require('querystring');
 const url = require('url');
-const util = require('util');
 
 //Modules
 const _ = require('lodash');
+const Promise = require('bluebird');
 const request = require('request');
 
 function PaymentProtocol(options) {
@@ -46,18 +46,18 @@ PaymentProtocol.prototype.getRawPaymentRequest = function getRawPaymentRequest(p
       return callback(err);
     }
     if (response.statusCode !== 200) {
-      return callback(new Error(response.body.toString()));
-    }
+    return callback(new Error(response.body.toString()));
+  }
 
-    return callback(null, {rawBody: response.body, headers: response.headers});
-  });
+  return callback(null, {rawBody: response.body, headers: response.headers});
+});
 };
 
 /**
  * Makes a request to the given url and returns the raw JSON string retrieved as well as the headers
  * @param url {string} the payment protocol specific url (https)
  */
-PaymentProtocol.prototype.getRawPaymentRequestAsync = util.promisify(PaymentProtocol.prototype.getRawPaymentRequest);
+PaymentProtocol.prototype.getRawPaymentRequestAsync = Promise.promisify(PaymentProtocol.prototype.getRawPaymentRequest);
 
 /**
  * Given a raw payment protocol body, parses it and validates it against the digest header
@@ -101,7 +101,7 @@ PaymentProtocol.prototype.parsePaymentRequest = function parsePaymentRequest(raw
  * @param rawBody {string} Raw JSON string retrieved from the payment protocol server
  * @param headers {object} Headers sent by the payment protocol server
  */
-PaymentProtocol.prototype.parsePaymentRequestAsync = util.promisify(PaymentProtocol.prototype.parsePaymentRequest);
+PaymentProtocol.prototype.parsePaymentRequestAsync = Promise.promisify(PaymentProtocol.prototype.parsePaymentRequest);
 
 /**
  * Sends a given payment to the server for validation
@@ -137,18 +137,18 @@ PaymentProtocol.prototype.sendPayment = function sendPayment(currency, signedRaw
       return callback(err);
     }
     if (response.statusCode !== 200) {
-      return callback(new Error(response.body.toString()));
-    }
+    return callback(new Error(response.body.toString()));
+  }
 
-    try {
-      paymentResponse = JSON.parse(response.body);
-    }
-    catch (e) {
-      return callback(new Error('Unable to parse response from server'));
-    }
+  try {
+    paymentResponse = JSON.parse(response.body);
+  }
+  catch (e) {
+    return callback(new Error('Unable to parse response from server'));
+  }
 
-    callback(null, paymentResponse);
-  });
+  callback(null, paymentResponse);
+});
 };
 
 /**
@@ -157,7 +157,7 @@ PaymentProtocol.prototype.sendPayment = function sendPayment(currency, signedRaw
  * @param signedRawTransaction {string} Hexadecimal format raw signed transaction
  * @param url {string} the payment protocol specific url (https)
  */
-PaymentProtocol.prototype.sendPaymentAsync = util.promisify(PaymentProtocol.prototype.sendPayment);
+PaymentProtocol.prototype.sendPaymentAsync = Promise.promisify(PaymentProtocol.prototype.sendPayment);
 
 module.exports = PaymentProtocol;
 
