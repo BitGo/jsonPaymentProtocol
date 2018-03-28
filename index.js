@@ -24,7 +24,7 @@ PaymentProtocol.prototype.getRawPaymentRequest = function getRawPaymentRequest(p
   let paymentUrlObject = url.parse(paymentUrl);
 
   //Detect 'bitcoin:' urls and extract payment-protocol section
-  if (paymentUrlObject.protocol !== 'http' && paymentUrlObject.protocol !== 'https') {
+  if (paymentUrlObject.protocol !== 'http:' && paymentUrlObject.protocol !== 'https:') {
     let uriQuery = query.decode(paymentUrlObject.query);
     if (!uriQuery.r) {
       return callback(new Error('Invalid payment protocol url'));
