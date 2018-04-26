@@ -1,10 +1,10 @@
 'use strict';
-//Native
+// Native
 const crypto = require('crypto');
 const query = require('querystring');
 const url = require('url');
 
-//Modules
+// Modules
 const _ = require('lodash');
 const Promise = require('bluebird');
 const request = require('request');
@@ -21,23 +21,26 @@ function PaymentProtocol(options) {
  * @param callback {function} (err, body, headers)
  */
 PaymentProtocol.prototype.getRawPaymentRequest = function getRawPaymentRequest(paymentUrl, callback) {
-  let paymentUrlObject = url.parse(paymentUrl);
+  const paymentUrlObject = url.parse(paymentUrl);
 
-  //Detect 'bitcoin:' urls and extract payment-protocol section
+  // Detect 'bitcoin:' urls and extract payment-protocol section
   if (paymentUrlObject.protocol !== 'http:' && paymentUrlObject.protocol !== 'https:') {
-    let uriQuery = query.decode(paymentUrlObject.query);
+    const uriQuery = query.decode(paymentUrlObject.query);
     if (!uriQuery.r) {
       return callback(new Error('Invalid payment protocol url'));
-    }
-    else {
+    } else {
       paymentUrl = uriQuery.r;
     }
   }
 
-  let requestOptions = _.merge(this.options, {
+  if (paymentUrl.startsWith('http:')) {
+    return callback(new Error('http in not supported'));
+  }
+
+  const requestOptions = _.merge(this.options, {
     url: paymentUrl,
     headers: {
-      'Accept': 'application/payment-request'
+      Accept: 'application/payment-request'
     }
   });
 
@@ -46,11 +49,11 @@ PaymentProtocol.prototype.getRawPaymentRequest = function getRawPaymentRequest(p
       return callback(err);
     }
     if (response.statusCode !== 200) {
-    return callback(new Error(response.body.toString()));
-  }
+      return callback(new Error(response.body.toString()));
+    }
 
-  return callback(null, {rawBody: response.body, headers: response.headers});
-});
+    return callback(null, { rawBody: response.body, headers: response.headers });
+  });
 };
 
 /**
@@ -77,8 +80,7 @@ PaymentProtocol.prototype.parsePaymentRequest = function parsePaymentRequest(raw
 
   try {
     paymentRequest = JSON.parse(rawBody);
-  }
-  catch (e) {
+  } catch (e) {
     return callback(new Error(`Unable to parse request - ${e}`));
   }
 
@@ -86,8 +88,8 @@ PaymentProtocol.prototype.parsePaymentRequest = function parsePaymentRequest(raw
     return callback(new Error('Digest missing from response headers'));
   }
 
-  let digest = headers.digest.split('=')[1];
-  let hash = crypto.createHash('sha256').update(rawBody, 'utf8').digest('hex');
+  const digest = headers.digest.split('=')[1];
+  const hash = crypto.createHash('sha256').update(rawBody, 'utf8').digest('hex');
 
   if (digest !== hash) {
     return callback(new Error(`Response body hash does not match digest header. Actual: ${hash} Expected: ${digest}`));
@@ -113,7 +115,7 @@ PaymentProtocol.prototype.parsePaymentRequestAsync = Promise.promisify(PaymentPr
 PaymentProtocol.prototype.sendPayment = function sendPayment(currency, signedRawTransaction, url, callback) {
   let paymentResponse;
 
-  //Basic sanity checks
+  // Basic sanity checks
   if (typeof signedRawTransaction !== 'string') {
     return callback(new Error('signedRawTransaction must be a string'));
   }
@@ -121,7 +123,7 @@ PaymentProtocol.prototype.sendPayment = function sendPayment(currency, signedRaw
     return callback(new Error('signedRawTransaction must be in hexadecimal format'));
   }
 
-  let requestOptions = _.merge(this.options, {
+  const requestOptions = _.merge(this.options, {
     url: url,
     headers: {
       'Content-Type': 'application/payment'
@@ -137,18 +139,17 @@ PaymentProtocol.prototype.sendPayment = function sendPayment(currency, signedRaw
       return callback(err);
     }
     if (response.statusCode !== 200) {
-    return callback(new Error(response.body.toString()));
-  }
+      return callback(new Error(response.body.toString()));
+    }
 
-  try {
-    paymentResponse = JSON.parse(response.body);
-  }
-  catch (e) {
-    return callback(new Error('Unable to parse response from server'));
-  }
+    try {
+      paymentResponse = JSON.parse(response.body);
+    } catch (e) {
+      return callback(new Error('Unable to parse response from server'));
+    }
 
-  callback(null, paymentResponse);
-});
+    callback(null, paymentResponse);
+  });
 };
 
 /**
